@@ -94,14 +94,18 @@ def add_sticker_cell(
         box_size=2,
         border=1,
     )
-    
+
     if row['Serotype'] != row['Serotype']:
         row['Serotype'] = ''
         
     if row['Name'] != row['Name']:
         row['Name'] = ' '
+    
+    if row['FullName'] != row['FullName']:
+        row['FullName'] = ''
+    
 
-    qr_data = f"{row['VT']}\n{row['Plasmid']}\n{row['Name']}\n{row['Serotype']}"
+    qr_data = f"{row['VT']}"
     qr.add_data(qr_data)
     img = qr.make_image(back_color=(255, 255, 255), fill_color=(0, 0, 0))
         
@@ -128,6 +132,19 @@ def add_sticker_cell(
         )
     
     x_offset = int(round(x_step) * 0.7)
+    y_offset = int(round(y_step) * .95)
+    
+    pdf.set_xy(2 * x_step * x_loc + x_margin, y_step * y_loc + y_margin)
+    with pdf.rotation(angle=a-180, x = x+3, y = y-16):
+        pdf.set_font(style="", size = 6)
+        pdf.multi_cell(
+            w = y_step*.7,
+            align=fpdf.Align.C,
+            text = f"{row['FullName']}",
+            border = 0,
+        )
+    
+    x_offset = int(round(x_step) * 0.9)
     y_offset = int(round(y_step) * .95)
     
     pdf.image(img.get_image(), x + x_offset, y - y_offset)
@@ -210,7 +227,7 @@ def main(filepath, save_path):
 
     """
     
-    df = pd.read_csv(Path(filepath))
+    df = pd.read_csv(Path(filepath), dtype=str)
     add_data_to_template(df, Path(save_path), 2, 10)
     
     
