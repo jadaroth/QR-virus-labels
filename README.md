@@ -11,17 +11,17 @@ Plain text will be printed on the label, showing VT, Plasmid, Name, and Serotype
 A QR code is also generated, encoding the VT # only. The Plasmid's FullName is printed in plain text above the QR code.
 
 
-**Generate a conda environment with following:**
+**Generate a conda environment (ENV-NAME) with following:**
 
 python version 3.9, fpdf2, qrcode, pandas, and anaconda::spyder
 
 **The conda environment only needs to be created once. Afterwards, you can simply re-activate it**
 ```
 ## In your terminal/console, type the following line-by-line and follow prompts
-conda create -n "NAME" python = 3.9
+conda create -n ENV-NAME python = 3.9
 ```
 ```
-conda activate "NAME"
+conda activate ENV-NAME
 ```
 ```
 cd /Users/jada.roth/Desktop
@@ -39,14 +39,14 @@ conda install anaconda::spyder
 
 **Running script**
 ```
-conda activate "NAME"
+conda activate ENV-NAME
 ```
 ```
 ## Change directory to the path where your input csv and module are located
 cd /Users/jada.roth/Desktop
 ```
 ```
-python -m NAME Path1 Path2
+python -m print_labels Path1 Path2
 ## Path 1 is where your input CSV is located
 ## Path 2 is where you'd like to output your label pdf
 ```
