@@ -56,6 +56,9 @@ python -m print_labels Path1 Path2
 Make sure to print using "actual size" in your scale options. Otherwise, alignment will be off. 
 
 **Change log**
+09/05/2025:
+Deployed beta app hosted on streamlist for better UI/UX. https://qr-virus-labels.streamlit.app/
+
 04/18/2025: 
 Updated README with more robust instructions and descriptions. 
 12/23/2024: Updated print_labels.py, uploaded tic_tac_QR_code.csv as example input file, uploaded tutorial word document. 
