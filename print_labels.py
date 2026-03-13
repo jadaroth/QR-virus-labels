@@ -210,45 +210,110 @@ def add_data_to_template(data, save_path, x_max = 2, y_max = 10):
         template.output(out_path)
         return
 
+def load_file(filepath):
+    """
+    Loads a data file into a dataframe, supporting csv of any encoding, excel (.xlsx, .xls),
+    tsv, and ods formats.
+    
+    Parameters
+    ----------
+    filepath: str or path
+    
+    Returns
+    -------
+    df: pd.DataFrame
+        Loaded data as a dataframe with all columns cast to str
+    
+    Raises
+    ------
+    Value error if file extension is not supported
+    """
+    path = Path(filepath)
+    ext = path.suffix.lower()
+    
+    if ext in (".xlsx", ".xls", ".ods"):
+        df = pd.read_excel(path, dtype=str)
+ 
+    elif ext == ".tsv":
+        df = _read_csv_any_encoding(path, sep="\t")
+ 
+    elif ext == ".csv":
+        df = _read_csv_any_encoding(path, sep=",")
+ 
+    else:
+        raise ValueError(
+            f"Unsupported file type '{ext}'. "
+            "Supported formats: .csv, .tsv, .xlsx, .xls, .ods"
+        )
+ 
+    return df
+
+def _read_csv_any_encoding(path, sep=","):
+    """
+    Attempts to read a delimited text file by trying common encodings in order.
+ 
+    Parameters
+    ----------
+    path : Path
+        Path to the CSV/TSV file.
+    sep : str
+        Column delimiter. Default is ','.
+ 
+    Returns
+    -------
+    df : pd.DataFrame
+    """
+    encodings = ["utf-8", "utf-8-sig", "latin-1", "cp1252", "iso-8859-1"]
+    for enc in encodings:
+        try:
+            return pd.read_csv(path, dtype=str, sep=sep, encoding=enc)
+        except (UnicodeDecodeError, ValueError):
+            continue
+    raise ValueError(
+        f"Could not decode '{path.name}' with any of the attempted encodings: "
+        + ", ".join(encodings)
+    )
+ 
+ 
 def main(filepath, save_path):
     """
     Main function that creates and saves the label sheet
-
+ 
     Parameters
     ----------
     filepath : str
-        the excel file that you want to create labels from
+        Path to the input file (.csv, .tsv, .xlsx, .xls, or .ods)
     save_path : str
         the location where you want to save the label sheets
-
+ 
     Returns
     -------
     None.
-
+ 
     """
     
-    df = pd.read_csv(Path(filepath), dtype=str)
+    df = load_file(filepath)
     add_data_to_template(df, Path(save_path), 2, 10)
     
-    
     return 
-
+ 
 if __name__ == "__main__":
     """
     This will be executed when the script is run in terminal. The two inputs 
-    needed are the xlsx file with the data and the path where you want to save 
-    the outputs
-    
-    
-    Example: python -m label_template_creator /Users/nicholas.lusk/Desktop/tic_tac_QR_code.csv /Users/nicholas.lusk/Desktop
-
+    needed are the data file and the path where you want to save the outputs.
+ 
+    Supported input formats: .csv, .tsv, .xlsx, .xls, .ods
+    CSV/TSV files are auto-detected for encoding (UTF-8, Latin-1, CP1252, etc.)
+ 
+    Example:
+        python -m label_template_creator /Users/jada.roth/Desktop/labels.xlsx /Users/jada.roth/Desktop
+        python -m label_template_creator /Users/jada.roth/Desktop/labels.csv /Users/jada.roth/Desktop
     """
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("filepath", type = str, help = "Insert full pathway to excel xlsx file you want to process")
-    parser.add_argument("save_path", type = str, help = "Insert the full pathway to where you want to save the files")
+    parser.add_argument("filepath", type=str, help="Full path to the input file (.csv, .tsv, .xlsx, .xls, .ods)")
+    parser.add_argument("save_path", type=str, help="Full path to the folder where output PDFs will be saved")
     
     args = parser.parse_args()
     
     main(args.filepath, args.save_path)
-
